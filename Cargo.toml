@@ -1,0 +1,57 @@
+[package]
+name = "mxl-investigator"
+version = "0.1.0"
+license = "MIT OR APACHE-2.0"
+repository = "https://github.com/x-software-com/mxl-investigator/"
+description = "This is a component of the X-Software MXL product line."
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1"
+log = "0.4"
+fs4 = "0.8"
+directories = "5"
+chrono = { version = "0.4" }
+zip = "0.6"
+walkdir = "2"
+tempfile = { version = "3", optional = true }
+trash = "3"
+const_format = "0.2"
+relm4 = { version = "=0.7.0-rc.1", features = [
+    "macros",
+    "libadwaita",
+    "gnome_44",
+], optional = true }
+relm4-components = { version = "=0.7.0-rc.1", optional = true }
+relm4-icons = { version = "0.7.0-alpha.2", default-features = false, optional = true }
+mxl-relm4-components = { git = "https://github.com/x-software-com/mxl-relm4-components.git", tag = "v0.1.4", optional = true }
+urlencoding = { version = "2", default-features = false, optional = true }
+
+# Internationalization:
+i18n-embed-fl = { version = "0.8" }
+once_cell = { version = "1" }
+rust-embed = { version = "8", features = ["debug-embed"] }
+i18n-embed = { version = "0.14", features = [
+    "fluent-system",
+    "desktop-requester",
+] }
+
+[features]
+with_test = ["dep:tempfile"]
+create_report_dialog = [
+    "dep:mxl-relm4-components",
+    "dep:relm4",
+    "dep:relm4-components",
+    "relm4-icons/right-large",
+    "dep:urlencoding",
+]
+problem_report_dialog = [
+    "dep:mxl-relm4-components",
+    "dep:relm4",
+    "dep:relm4-components",
+    "relm4-icons/right-large",
+    "relm4-icons/left-large",
+    "dep:urlencoding",
+]
