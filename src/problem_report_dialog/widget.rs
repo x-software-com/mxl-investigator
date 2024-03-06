@@ -3,13 +3,16 @@ use super::{
     model::{ProblemReportDialog, ProblemReportDialogInit},
 };
 use crate::localization::helper::fl;
-use relm4::{
-    adw::{self, prelude::*},
-    gtk::glib,
-    prelude::*,
-    Component, ComponentParts, ComponentSender,
+use mxl_relm4_components::{
+    relm4::{
+        self,
+        adw::{self, prelude::*},
+        gtk::glib,
+        prelude::*,
+        Component, ComponentParts, ComponentSender,
+    },
+    relm4_components::save_dialog::{SaveDialog, SaveDialogMsg, SaveDialogResponse, SaveDialogSettings},
 };
-use relm4_components::save_dialog::{SaveDialog, SaveDialogMsg, SaveDialogResponse, SaveDialogSettings};
 use relm4_icons::icon_name;
 
 macro_rules! report_subject_fmt {

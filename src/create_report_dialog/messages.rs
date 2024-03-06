@@ -1,4 +1,4 @@
-use relm4::gtk;
+use mxl_relm4_components::relm4::gtk;
 use std::path::PathBuf;
 
 pub(super) mod internal {

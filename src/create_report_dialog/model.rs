@@ -1,5 +1,4 @@
-use relm4::Controller;
-use relm4_components::save_dialog::SaveDialog;
+use mxl_relm4_components::{relm4::Controller, relm4_components::save_dialog::SaveDialog};
 
 #[derive(Debug)]
 pub struct CreateReportDialogInit {
