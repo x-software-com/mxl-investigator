@@ -7,7 +7,10 @@ pub(crate) const SUPPORT_EMAIL: &str = "support@x-software.com";
 static PROJECT_DATA_DIR: OnceCell<PathBuf> = OnceCell::new();
 
 pub fn init(project_data_dir: PathBuf) {
-    PROJECT_DATA_DIR.set(project_data_dir).expect("Already initialized")
+    PROJECT_DATA_DIR.set(project_data_dir).expect("Already initialized");
+    crate::localization::init();
+    #[cfg(any(feature = "create_report_dialog", feature = "problem_report_dialog"))]
+    mxl_relm4_components::init();
 }
 
 pub(crate) fn get_data_dir() -> &'static PathBuf {
