@@ -145,7 +145,7 @@ impl Component for CreateReportDialog {
                             {
                                 let filter = gtk::FileFilter::new();
                                 filter.set_name(Some(&fl!("create-report-dialog", "zip-archive")));
-                                filter.add_suffix(crate::proc_dir::ARCHIVE_DEFAULT_FILE_SUFFIX);
+                                filter.add_suffix(crate::proc_dir::ARCHIVE_DEFAULT_FILE_EXTENSION);
                                 filter
                             },
                             {

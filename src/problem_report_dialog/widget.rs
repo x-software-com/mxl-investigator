@@ -151,7 +151,7 @@ impl Component for ProblemReportDialog {
                             {
                                 let filter = gtk::FileFilter::new();
                                 filter.set_name(Some(&fl!("problem-report-dialog", "zip-archive")));
-                                filter.add_suffix(crate::proc_dir::ARCHIVE_DEFAULT_FILE_SUFFIX);
+                                filter.add_suffix(crate::proc_dir::ARCHIVE_DEFAULT_FILE_EXTENSION);
                                 filter
                             },
                             {
@@ -221,7 +221,7 @@ impl Component for ProblemReportDialog {
                 }
                 PrivateMsg::CreateReport(path) => {
                     self.file_name = path.to_string_lossy().to_string();
-                    if let Err(err) = crate::proc_dir::failed_procs_archive_and_remove(&path) {
+                    if let Err(err) = crate::proc_dir::failed_dir_archive_and_remove(&path) {
                         widgets
                             .error_page
                             .set_title(&fl!("problem-report-dialog", "error-create-title"));
@@ -239,7 +239,7 @@ impl Component for ProblemReportDialog {
                     self.update_view(widgets, sender);
                 }
                 PrivateMsg::MoveToTrash => {
-                    if let Err(err) = crate::proc_dir::failed_procs_move_to_trash() {
+                    if let Err(err) = crate::proc_dir::failed_dir_move_to_trash() {
                         widgets
                             .error_page
                             .set_title(&fl!("problem-report-dialog", "error-move-title"));

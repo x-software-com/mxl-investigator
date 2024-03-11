@@ -1,22 +1,27 @@
 use crate::localization::helper::fl;
 use anyhow::{Context, Result};
 use fs4::FileExt;
-use once_cell::sync::OnceCell;
+use once_cell::sync::{Lazy, OnceCell};
 use std::{
     fs::File,
     io::{Read, Write},
+    panic,
     path::{Path, PathBuf},
+    sync::RwLock,
 };
 use walkdir::WalkDir;
 use zip::{write::FileOptions, ZipWriter};
 
-pub const ARCHIVE_DEFAULT_FILE_SUFFIX: &str = "zip";
+pub const ARCHIVE_DEFAULT_FILE_EXTENSION: &str = "zip";
 pub const ARCHIVE_MIME_TYPE: &str = "application/x-zip";
 
 const CURRENT_DIR_FMT: &str = "%Y-%m-%d_%H_%M_%S";
 const PROC_DIR_NAME: &str = "proc";
 const PROC_FAILED_DIR_NAME: &str = "proc_failed";
 const LOCK_FILE_NAME: &str = "run.lock";
+const REPORT_FILE_NAME: &str = "exit_report.txt";
+const KEEP_NUMBER_OF_FAILED_RUNS: usize = 20;
+const PANIC_FILE_EXTENSION: &str = "panic";
 
 static RUN_DIR_HOLDER: OnceCell<PathBuf> = OnceCell::new();
 
@@ -41,6 +46,43 @@ pub fn default_failed_dir() -> &'static PathBuf {
         create_dir_all_with_panic(&failed_runs_path);
         failed_runs_path
     })
+}
+
+static FAILED_DIRS: Lazy<RwLock<Vec<PathBuf>>> = Lazy::new(|| RwLock::new(vec![default_failed_dir().clone()]));
+
+pub fn failed_dir_add(path: PathBuf) {
+    FAILED_DIRS.write().unwrap().push(path)
+}
+
+fn write_report_aborted_unexpected(path: &Path) -> Result<()> {
+    let report_file_path = path.join(REPORT_FILE_NAME);
+    if !report_file_path.try_exists()? {
+        std::fs::write(
+            report_file_path,
+            "The program run was aborted unexpectedly.\n\
+            This behavior is typically caused by a SIGKILL, but it can \
+            also be the result of a program crash or immediate termination.",
+        )?;
+    }
+    Ok(())
+}
+
+pub fn write_report_error(err: &anyhow::Error) {
+    let report_file_path = proc_dir().join(REPORT_FILE_NAME);
+    match std::fs::OpenOptions::new()
+        .append(true)
+        .open(report_file_path)
+        .with_context(|| "Cannot open report file")
+    {
+        Ok(mut file) => {
+            if let Err(err) = writeln!(file, "The program run exited with error:\n{:?}", err)
+                .with_context(|| "Cannot write report file")
+            {
+                log::warn!("{:?}", err)
+            }
+        }
+        Err(err) => log::warn!("{:?}", err),
+    }
 }
 
 fn move_to_failed_dir() -> Result<()> {
@@ -74,6 +116,10 @@ fn move_to_failed_dir() -> Result<()> {
             {
                 Ok(lock_file) => match lock_file.try_lock_exclusive() {
                     Ok(()) => {
+                        // Lock file present - this is an aborted run
+                        if let Err(err) = write_report_aborted_unexpected(&existing_run_dir) {
+                            log::warn!("{:?}", err);
+                        }
                         preserve_dir(&existing_run_dir)?;
                     }
                     Err(_error) => {
@@ -83,6 +129,7 @@ fn move_to_failed_dir() -> Result<()> {
                 Err(error) => match error.downcast_ref::<std::io::Error>() {
                     Some(err) => {
                         if std::io::ErrorKind::NotFound == err.kind() {
+                            // No lock file - An error occurred in this run
                             preserve_dir(&existing_run_dir)?;
                         } else {
                             return Err(error);
@@ -101,7 +148,8 @@ struct LockFile(File, PathBuf);
 
 impl Drop for LockFile {
     fn drop(&mut self) {
-        // LockFile is not removed if the process is killed via SIGKILL
+        // LockFile is not removed if the process is unexpected aborted.
+        // This behavior is caused by a SIGKILL, crash or immediate termination like std::process::exit().
         let file_name = &self.1;
         _ = std::fs::remove_file(file_name);
     }
@@ -135,11 +183,18 @@ pub fn proc_dir() -> &'static PathBuf {
     })
 }
 
-pub fn remove_proc_dir() -> std::io::Result<()> {
+pub fn cleanup() -> Result<()> {
     if let Some(data_dir) = RUN_DIR_HOLDER.get() {
+        // Remove the current run directory
         std::fs::remove_dir_all(data_dir)?;
     }
-    Ok(())
+
+    // Cleanup other failed runs
+    cleanup_dir(default_failed_dir())
+    // for dir in FAILED_DIRS.read().unwrap().iter() {
+    //     cleanup_dir(&dir)?;
+    // }
+    // Ok(())
 }
 
 fn create_archive(src_dirs: &[PathBuf], archive_file_path: &Path) -> Result<()> {
@@ -154,7 +209,13 @@ fn create_archive(src_dirs: &[PathBuf], archive_file_path: &Path) -> Result<()> 
     let options = FileOptions::default().compression_method(zip::CompressionMethod::Bzip2);
 
     for src_dir in src_dirs {
-        let parent_dir = src_dir.parent().unwrap_or_else(|| src_dir);
+        let parent_dir = src_dir
+            .parent()
+            .unwrap_or_else(|| src_dir)
+            .parent()
+            .unwrap_or_else(|| src_dir)
+            .parent()
+            .unwrap_or_else(|| src_dir);
         let walk_dir = WalkDir::new(src_dir);
         let it = walk_dir.into_iter().filter_map(|e| e.ok());
         let mut buffer = Vec::new();
@@ -203,33 +264,116 @@ fn create_archive(src_dirs: &[PathBuf], archive_file_path: &Path) -> Result<()> 
     Ok(())
 }
 
-pub fn failed_procs_is_empty() -> Result<bool> {
-    Ok(default_failed_dir().read_dir()?.next().is_none())
+pub fn failed_dir_is_empty() -> Result<bool> {
+    for dir in FAILED_DIRS.read().unwrap().iter() {
+        let is_empty = dir.read_dir()?.next().is_none();
+        if !is_empty {
+            return Ok(false);
+        }
+    }
+    Ok(true)
+}
+
+fn dir_has_panic(path: &Path) -> Result<bool> {
+    if !path.is_dir() {
+        return Ok(false);
+    }
+    let panic_extension = std::ffi::OsString::from(PANIC_FILE_EXTENSION);
+    Ok(!std::fs::read_dir(path)?
+        .filter(|entry| {
+            if let Ok(entry) = entry {
+                let path = entry.path();
+                if !path.is_file() {
+                    return false;
+                }
+                if let Some(extension) = path.extension() {
+                    return extension == panic_extension.as_os_str();
+                }
+            }
+            true
+        })
+        .collect::<std::io::Result<Vec<_>>>()?
+        .is_empty())
+}
+
+pub fn failed_dir_any_panic() -> Result<bool> {
+    for dir in FAILED_DIRS.read().unwrap().iter() {
+        let is_any = std::fs::read_dir(dir)?
+            .map(|entry| match entry {
+                Ok(entry) => dir_has_panic(entry.path().as_path()),
+                Err(err) => Err(err.into()),
+            })
+            .collect::<Result<Vec<_>>>()?
+            .iter()
+            .any(|item| *item);
+        if is_any {
+            return Ok(true);
+        }
+    }
+    Ok(false)
+}
+
+fn cleanup_dir(dir: &Path) -> Result<()> {
+    let mut dirs = std::fs::read_dir(dir)?
+        .map(|entry| {
+            let path = entry?.path();
+            if !path.is_dir() || dir_has_panic(path.as_path())? {
+                return Ok(None);
+            }
+            Ok(Some(path))
+        })
+        .filter_map(|entry| match entry {
+            Ok(entry) => entry.map(Ok),
+            Err(err) => Some(Err(err)),
+        })
+        .collect::<Result<Vec<_>>>()?;
+
+    if dirs.len() > KEEP_NUMBER_OF_FAILED_RUNS {
+        dirs.sort();
+        let mut len = dirs.len();
+        for dir in dirs.iter() {
+            std::fs::remove_dir_all(dir)
+                .with_context(|| format!("Cannot remove directory '{}'", dir.to_string_lossy()))?;
+            len -= 1;
+            if len <= KEEP_NUMBER_OF_FAILED_RUNS {
+                break;
+            }
+        }
+    }
+    Ok(())
 }
 
 #[cfg(feature = "problem_report_dialog")]
 pub(crate) fn create_problem_report_file_name(binary_name: &str) -> String {
-    format!("{}_problem_report.{}", binary_name, ARCHIVE_DEFAULT_FILE_SUFFIX)
+    format!("{}_problem_report.{}", binary_name, ARCHIVE_DEFAULT_FILE_EXTENSION)
 }
 
-pub fn failed_procs_archive_and_remove(archive_file_path: &Path) -> Result<()> {
-    let failed_dir = default_failed_dir();
-    let directories = std::fs::read_dir(failed_dir)?
-        .map(|entry| Ok(entry?.path()))
-        .collect::<std::io::Result<Vec<_>>>()?;
+fn rm_dirs(dirs: &[PathBuf]) -> Result<()> {
+    for item in dirs {
+        if item.is_file() {
+            std::fs::remove_file(item).with_context(|| format!("Cannot remove file '{}'", item.to_string_lossy()))?;
+        } else {
+            std::fs::remove_dir_all(item)
+                .with_context(|| format!("Cannot remove directory '{}'", item.to_string_lossy()))?;
+        }
+    }
+    Ok(())
+}
+
+pub fn failed_dir_archive_and_remove(archive_file_path: &Path) -> Result<()> {
+    let mut directories = Vec::new();
+    for dir in FAILED_DIRS.read().unwrap().iter() {
+        let mut paths = std::fs::read_dir(dir)?
+            .map(|entry| Ok(entry?.path()))
+            .collect::<std::io::Result<Vec<_>>>()?;
+        directories.append(&mut paths);
+    }
     if directories.is_empty() {
         println!("{}", fl!("no-bug-reports"));
         return Ok(());
     }
     create_archive(&directories, archive_file_path)?;
-    for item in directories {
-        if item.is_file() {
-            std::fs::remove_file(&item).with_context(|| format!("Cannot remove file '{}'", item.to_string_lossy()))?;
-        } else {
-            std::fs::remove_dir_all(&item)
-                .with_context(|| format!("Cannot remove directory '{}'", item.to_string_lossy()))?;
-        }
-    }
+    rm_dirs(&directories)?;
     println!(
         "{}",
         fl!("bug-report-written-to", file_name = archive_file_path.to_string_lossy())
@@ -237,19 +381,75 @@ pub fn failed_procs_archive_and_remove(archive_file_path: &Path) -> Result<()> {
     Ok(())
 }
 
-pub fn failed_procs_move_to_trash() -> Result<()> {
-    let failed_dir = default_failed_dir();
-    let directories = std::fs::read_dir(failed_dir)?
-        .map(|entry| Ok(entry?.path()))
-        .collect::<std::io::Result<Vec<_>>>()?;
-    trash::delete_all(directories).with_context(|| "Cannot move failed executions to trash")
+pub fn failed_dir_move_to_trash() -> Result<()> {
+    for dir in FAILED_DIRS.read().unwrap().iter() {
+        let directories = std::fs::read_dir(dir)?
+            .map(|entry| Ok(entry?.path()))
+            .collect::<std::io::Result<Vec<_>>>()?;
+        trash::delete_all(directories).with_context(|| "Cannot move failed executions to trash")?;
+    }
+    Ok(())
 }
 
 #[cfg(feature = "create_report_dialog")]
 pub(crate) fn create_report_file_name(binary_name: &str) -> String {
-    format!("{}_report.{}", binary_name, ARCHIVE_DEFAULT_FILE_SUFFIX)
+    format!("{}_report.{}", binary_name, ARCHIVE_DEFAULT_FILE_EXTENSION)
 }
 
 pub fn proc_dir_archive(archive_file_path: &Path) -> Result<()> {
-    create_archive(&[proc_dir().to_owned()], archive_file_path)
+    let mut directories = std::fs::read_dir(default_proc_dir())?
+        .map(|entry| Ok(entry?.path()))
+        .collect::<std::io::Result<Vec<_>>>()?;
+    let mut failed_dirs = Vec::new();
+    for dir in FAILED_DIRS.read().unwrap().iter() {
+        let mut paths = std::fs::read_dir(dir)?
+            .map(|entry| Ok(entry?.path()))
+            .collect::<std::io::Result<Vec<_>>>()?;
+        failed_dirs.append(&mut paths);
+    }
+    directories.append(&mut failed_dirs.clone());
+    create_archive(&directories, archive_file_path)?;
+    rm_dirs(&failed_dirs)
+}
+
+pub fn setup_panic() {
+    let log_dir_clone = proc_dir().to_owned();
+    panic::set_hook(Box::new(move |info| {
+        let backtrace = backtrace::Backtrace::new();
+        let thread = std::thread::current();
+        let thread_name = thread.name().unwrap_or("<unnamed>");
+        let cause = match info.payload().downcast_ref::<&'static str>() {
+            Some(s) => *s,
+            None => match info.payload().downcast_ref::<String>() {
+                Some(s) => &**s,
+                None => "Box<Any>",
+            },
+        };
+
+        let dump = match info.location() {
+            Some(location) => {
+                format!(
+                    "Thread '{thread_name}' panicked at '{cause}': {file_name}:{line}:{column}\n{backtrace:?}",
+                    file_name = location.file(),
+                    line = location.line(),
+                    column = location.column()
+                )
+            }
+            None => format!("Thread '{thread_name}' panicked at '{cause}'\n{backtrace:?}"),
+        };
+        std::eprint!("{dump}");
+        let file_name = format!(
+            "{}.{}",
+            humantime::format_rfc3339(std::time::SystemTime::now()),
+            PANIC_FILE_EXTENSION
+        );
+        let panic_file = log_dir_clone.join(file_name);
+        if let Err(err) = std::fs::write(&panic_file, dump) {
+            std::eprint!(
+                "Cannot write panic into file '{}': {:?}",
+                panic_file.to_string_lossy(),
+                err
+            );
+        }
+    }));
 }
