@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [v0.1.3](https://github.com/x-software-com/mxl-investigator/compare/v0.1.2..v0.1.3) - 2024-03-11
+#### Bug Fixes
+- add panic handling - ([f2cae2d](https://github.com/x-software-com/mxl-investigator/commit/f2cae2dbd7bb226b59f8f0ec9cf05850dfb05c4b)) - acpiccolo
+
+- - -
+
 ## [v0.1.2](https://github.com/x-software-com/mxl-investigator/compare/v0.1.1..v0.1.2) - 2024-03-07
 #### Bug Fixes
 - fix initialization - ([15eeebd](https://github.com/x-software-com/mxl-investigator/commit/15eeebd7709e7acaff38668e50885cfc55f8e1d2)) - acpiccolo
