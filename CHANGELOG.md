@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [v0.1.4](https://github.com/x-software-com/mxl-investigator/compare/v0.1.3..v0.1.4) - 2024-03-21
+#### Miscellaneous Chores
+- upgrade mxl-relm4-components - ([35f5552](https://github.com/x-software-com/mxl-investigator/commit/35f555229cd5bf8fb1a5772bb2a54e5383b152b1)) - acpiccolo
+
+- - -
+
 ## [v0.1.3](https://github.com/x-software-com/mxl-investigator/compare/v0.1.2..v0.1.3) - 2024-03-11
 #### Bug Fixes
 - add panic handling - ([f2cae2d](https://github.com/x-software-com/mxl-investigator/commit/f2cae2dbd7bb226b59f8f0ec9cf05850dfb05c4b)) - acpiccolo
