@@ -413,43 +413,45 @@ pub fn proc_dir_archive(archive_file_path: &Path) -> Result<()> {
 }
 
 pub fn setup_panic() {
-    let log_dir_clone = proc_dir().to_owned();
-    panic::set_hook(Box::new(move |info| {
-        let backtrace = backtrace::Backtrace::new();
-        let thread = std::thread::current();
-        let thread_name = thread.name().unwrap_or("<unnamed>");
-        let cause = match info.payload().downcast_ref::<&'static str>() {
-            Some(s) => *s,
-            None => match info.payload().downcast_ref::<String>() {
-                Some(s) => &**s,
-                None => "Box<Any>",
-            },
-        };
+    panic::set_hook(Box::new({
+        let log_dir = proc_dir().to_owned();
+        move |info| {
+            let backtrace = backtrace::Backtrace::new();
+            let thread = std::thread::current();
+            let thread_name = thread.name().unwrap_or("<unnamed>");
+            let cause = match info.payload().downcast_ref::<&'static str>() {
+                Some(s) => *s,
+                None => match info.payload().downcast_ref::<String>() {
+                    Some(s) => &**s,
+                    None => "Box<Any>",
+                },
+            };
 
-        let dump = match info.location() {
-            Some(location) => {
-                format!(
-                    "Thread '{thread_name}' panicked at '{cause}': {file_name}:{line}:{column}\n{backtrace:?}",
-                    file_name = location.file(),
-                    line = location.line(),
-                    column = location.column()
-                )
-            }
-            None => format!("Thread '{thread_name}' panicked at '{cause}'\n{backtrace:?}"),
-        };
-        std::eprint!("{dump}");
-        let file_name = format!(
-            "{}.{}",
-            humantime::format_rfc3339(std::time::SystemTime::now()),
-            PANIC_FILE_EXTENSION
-        );
-        let panic_file = log_dir_clone.join(file_name);
-        if let Err(err) = std::fs::write(&panic_file, dump) {
-            std::eprint!(
-                "Cannot write panic into file '{}': {:?}",
-                panic_file.to_string_lossy(),
-                err
+            let dump = match info.location() {
+                Some(location) => {
+                    format!(
+                        "Thread '{thread_name}' panicked at '{cause}': {file_name}:{line}:{column}\n{backtrace:?}",
+                        file_name = location.file(),
+                        line = location.line(),
+                        column = location.column()
+                    )
+                }
+                None => format!("Thread '{thread_name}' panicked at '{cause}'\n{backtrace:?}"),
+            };
+            std::eprint!("{dump}");
+            let file_name = format!(
+                "{}.{}",
+                humantime::format_rfc3339(std::time::SystemTime::now()),
+                PANIC_FILE_EXTENSION
             );
+            let panic_file = log_dir.join(file_name);
+            if let Err(err) = std::fs::write(&panic_file, dump) {
+                std::eprint!(
+                    "Cannot write panic into file '{}': {:?}",
+                    panic_file.to_string_lossy(),
+                    err
+                );
+            }
         }
     }));
 }
