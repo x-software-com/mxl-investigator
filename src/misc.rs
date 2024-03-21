@@ -10,7 +10,10 @@ pub fn init(project_data_dir: PathBuf) {
     PROJECT_DATA_DIR.set(project_data_dir).expect("Already initialized");
     crate::localization::init();
     #[cfg(any(feature = "create_report_dialog", feature = "problem_report_dialog"))]
-    mxl_relm4_components::init();
+    {
+        relm4_icons::initialize_icons();
+        mxl_relm4_components::init();
+    }
 }
 
 pub(crate) fn get_data_dir() -> &'static PathBuf {

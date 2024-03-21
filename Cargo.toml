@@ -19,8 +19,8 @@ walkdir = "2"
 tempfile = { version = "3", optional = true }
 trash = "3"
 const_format = "0.2"
-relm4-icons = { version = "0.7.0-alpha.2", default-features = false, optional = true }
-mxl-relm4-components = { git = "https://github.com/x-software-com/mxl-relm4-components.git", tag = "v0.1.7", optional = true }
+relm4-icons = { version = "0.8.2", default-features = false, optional = true }
+mxl-relm4-components = { git = "https://github.com/x-software-com/mxl-relm4-components.git", tag = "v0.1.8", optional = true }
 urlencoding = { version = "2", default-features = false, optional = true }
 backtrace = "0.3"
 humantime = "2"
@@ -38,12 +38,11 @@ i18n-embed = { version = "0.14", features = [
 with_test = ["dep:tempfile"]
 create_report_dialog = [
     "dep:mxl-relm4-components",
-    "relm4-icons/right-large",
+    "relm4-icons/all",
     "dep:urlencoding",
 ]
 problem_report_dialog = [
     "dep:mxl-relm4-components",
-    "relm4-icons/right-large",
-    "relm4-icons/left-large",
+    "relm4-icons/all",
     "dep:urlencoding",
 ]

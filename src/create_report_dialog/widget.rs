@@ -13,7 +13,7 @@ use mxl_relm4_components::{
     },
     relm4_components::save_dialog::{SaveDialog, SaveDialogMsg, SaveDialogResponse, SaveDialogSettings},
 };
-use relm4_icons::icon_name;
+use relm4_icons::icon_names;
 
 macro_rules! report_subject_fmt {
     () => {
@@ -87,7 +87,7 @@ impl Component for CreateReportDialog {
                                     adw::ActionRow {
                                         set_title: &fl!("create-report-dialog", "btn-choose-file"),
                                         set_activatable: true,
-                                        add_suffix = &gtk::Image::from_icon_name(icon_name::RIGHT_LARGE) {},
+                                        add_suffix = &gtk::Image::from_icon_name(icon_names::RIGHT_LARGE) {},
                                         connect_activated => CreateReportDialogInput::PrivateMessage(PrivateMsg::OpenFileChooser),
                                     },
                                 },
@@ -116,7 +116,7 @@ impl Component for CreateReportDialog {
                                     adw::ActionRow {
                                         set_title: &fl!("create-report-dialog", "btn-choose-other-file"),
                                         set_activatable: true,
-                                        add_suffix = &gtk::Image::from_icon_name(icon_name::RIGHT_LARGE) {},
+                                        add_suffix = &gtk::Image::from_icon_name(icon_names::RIGHT_LARGE) {},
                                         connect_activated => CreateReportDialogInput::PrivateMessage(PrivateMsg::OpenFileChooser),
                                     },
                                 },
