@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [v0.1.7](https://github.com/x-software-com/mxl-investigator/compare/38b6102fdb436fcde1ae844c53e85d1cfea18565..v0.1.7) - 2024-03-21
+#### Bug Fixes
+- inisialization - ([38b6102](https://github.com/x-software-com/mxl-investigator/commit/38b6102fdb436fcde1ae844c53e85d1cfea18565)) - acpiccolo
+
+- - -
+
 ## [v0.1.6](https://github.com/x-software-com/mxl-investigator/compare/a959db2f72beab0760543519910640a9e101083d..v0.1.6) - 2024-03-21
 #### Bug Fixes
 - initialization - ([a959db2](https://github.com/x-software-com/mxl-investigator/commit/a959db2f72beab0760543519910640a9e101083d)) - acpiccolo
