@@ -2,6 +2,16 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [v0.1.11](https://github.com/x-software-com/mxl-investigator/compare/026690549dbf9aeb477c8157b5c9e634526bb15b..v0.1.11) - 2024-04-08
+#### Build system
+- upgrade mxl-relm4-components - ([08ffa97](https://github.com/x-software-com/mxl-investigator/commit/08ffa97efbded70cd9c837d009560971fa95ef78)) - acpiccolo
+- upgrade vcpkg to 2024.03.25 - ([2dd8e66](https://github.com/x-software-com/mxl-investigator/commit/2dd8e66759dc457ffb2b4d1a808a7abd3ca0aaa4)) - acpiccolo
+- change typos exclude - ([a94bb89](https://github.com/x-software-com/mxl-investigator/commit/a94bb8974035ee82003b518ec9262c6368bfc058)) - acpiccolo
+- exclude *.md files from typos - ([2607f3e](https://github.com/x-software-com/mxl-investigator/commit/2607f3e19779079af277d5aa9fcf56fcd08c509d)) - acpiccolo
+- removed --locked argument - ([0266905](https://github.com/x-software-com/mxl-investigator/commit/026690549dbf9aeb477c8157b5c9e634526bb15b)) - acpiccolo
+
+- - -
+
 ## [v0.1.10](https://github.com/x-software-com/mxl-investigator/compare/6bbb10508940898e4da1c2e6331a0df235d87306..v0.1.10) - 2024-04-08
 #### Miscellaneous Chores
 - upgrade mxl-relm4-components - ([6bbb105](https://github.com/x-software-com/mxl-investigator/commit/6bbb10508940898e4da1c2e6331a0df235d87306)) - acpiccolo
