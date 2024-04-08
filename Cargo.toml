@@ -20,7 +20,7 @@ tempfile = { version = "3", optional = true }
 trash = "3"
 const_format = "0.2"
 relm4-icons = { version = "0.8.2", default-features = false, optional = true }
-mxl-relm4-components = { git = "https://github.com/x-software-com/mxl-relm4-components.git", tag = "v0.1.9", optional = true }
+mxl-relm4-components = { git = "https://github.com/x-software-com/mxl-relm4-components.git", tag = "v0.1.10", optional = true }
 urlencoding = { version = "2", default-features = false, optional = true }
 backtrace = "0.3"
 humantime = "2"
