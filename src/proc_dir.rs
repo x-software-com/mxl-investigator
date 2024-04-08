@@ -70,6 +70,7 @@ fn write_report_aborted_unexpected(path: &Path) -> Result<()> {
 pub fn write_report_error(err: &anyhow::Error) {
     let report_file_path = proc_dir().join(REPORT_FILE_NAME);
     match std::fs::OpenOptions::new()
+        .create(true)
         .append(true)
         .open(report_file_path)
         .with_context(|| "Cannot open report file")
