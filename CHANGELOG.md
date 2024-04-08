@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [v0.1.9](https://github.com/x-software-com/mxl-investigator/compare/1e669f30804a9d64d7960550bbfcb73fe7937dfa..v0.1.9) - 2024-04-08
+#### Miscellaneous Chores
+- update vcpkg submodule - ([1e669f3](https://github.com/x-software-com/mxl-investigator/commit/1e669f30804a9d64d7960550bbfcb73fe7937dfa)) - acpiccolo
+
+- - -
+
 ## [v0.1.8](https://github.com/x-software-com/mxl-investigator/compare/b0afa2a1a17871c2f646b8e90babebb9ef264dfb..v0.1.8) - 2024-04-08
 #### Bug Fixes
 - fixed report file creation - ([b0afa2a](https://github.com/x-software-com/mxl-investigator/commit/b0afa2a1a17871c2f646b8e90babebb9ef264dfb)) - acpiccolo
