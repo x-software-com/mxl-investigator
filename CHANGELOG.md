@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [v0.1.10](https://github.com/x-software-com/mxl-investigator/compare/6bbb10508940898e4da1c2e6331a0df235d87306..v0.1.10) - 2024-04-08
+#### Miscellaneous Chores
+- upgrade mxl-relm4-components - ([6bbb105](https://github.com/x-software-com/mxl-investigator/commit/6bbb10508940898e4da1c2e6331a0df235d87306)) - acpiccolo
+
+- - -
+
 ## [v0.1.9](https://github.com/x-software-com/mxl-investigator/compare/1e669f30804a9d64d7960550bbfcb73fe7937dfa..v0.1.9) - 2024-04-08
 #### Miscellaneous Chores
 - update vcpkg submodule - ([1e669f3](https://github.com/x-software-com/mxl-investigator/commit/1e669f30804a9d64d7960550bbfcb73fe7937dfa)) - acpiccolo
