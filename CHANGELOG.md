@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [v0.1.12](https://github.com/x-software-com/mxl-investigator/compare/4236f0b17756c9bdfe7bc7d95c8c8f8b3c1ca876..v0.1.12) - 2024-04-16
+#### Miscellaneous Chores
+- **(deps)** update trash requirement from 3 to 4 - ([e4265af](https://github.com/x-software-com/mxl-investigator/commit/e4265af6efd6a7467272965dc0093c44402e987e)) - dependabot[bot]
+- **(deps)** bump crate-ci/typos from 1.18.2 to 1.20.4 - ([4236f0b](https://github.com/x-software-com/mxl-investigator/commit/4236f0b17756c9bdfe7bc7d95c8c8f8b3c1ca876)) - dependabot[bot]
+- cleanup failed directory also on startup - ([f776e7d](https://github.com/x-software-com/mxl-investigator/commit/f776e7d7f347ae59cdd71933dfe84f4debb854c6)) - acpiccolo
+
+- - -
+
 ## [v0.1.11](https://github.com/x-software-com/mxl-investigator/compare/026690549dbf9aeb477c8157b5c9e634526bb15b..v0.1.11) - 2024-04-08
 #### Build system
 - upgrade mxl-relm4-components - ([08ffa97](https://github.com/x-software-com/mxl-investigator/commit/08ffa97efbded70cd9c837d009560971fa95ef78)) - acpiccolo
