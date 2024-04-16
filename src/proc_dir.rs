@@ -180,6 +180,7 @@ pub fn proc_dir() -> &'static PathBuf {
             panic!("Cannot lock directory: {:?}", err);
         }
         move_to_failed_dir().unwrap_or_else(|error| panic!("Cannot move failed runs: {:?}", error));
+        cleanup_dir(default_failed_dir()).unwrap_or_else(|error| panic!("Cannot cleanup failed runs: {:?}", error));
         data_dir
     })
 }
