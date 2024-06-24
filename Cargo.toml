@@ -17,7 +17,7 @@ chrono = { version = "0.4" }
 zip = "0.6"
 walkdir = "2"
 tempfile = { version = "3", optional = true }
-trash = "4"
+trash = "5"
 const_format = "0.2"
 relm4-icons = { version = "0.8.2", default-features = false, optional = true }
 mxl-relm4-components = { git = "https://github.com/x-software-com/mxl-relm4-components.git", tag = "v0.1.11", optional = true }
