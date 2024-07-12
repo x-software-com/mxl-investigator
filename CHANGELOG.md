@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [v0.1.13](https://github.com/x-software-com/mxl-investigator/compare/78fde496705ed4c61956208d0f67b1579c088093..v0.1.13) - 2024-07-12
+#### Miscellaneous Chores
+- update dependencies - ([78fde49](https://github.com/x-software-com/mxl-investigator/commit/78fde496705ed4c61956208d0f67b1579c088093)) - acpiccolo
+
+- - -
+
 ## [v0.1.12](https://github.com/x-software-com/mxl-investigator/compare/4236f0b17756c9bdfe7bc7d95c8c8f8b3c1ca876..v0.1.12) - 2024-04-16
 #### Miscellaneous Chores
 - **(deps)** update trash requirement from 3 to 4 - ([e4265af](https://github.com/x-software-com/mxl-investigator/commit/e4265af6efd6a7467272965dc0093c44402e987e)) - dependabot[bot]
