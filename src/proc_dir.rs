@@ -10,7 +10,7 @@ use std::{
     sync::RwLock,
 };
 use walkdir::WalkDir;
-use zip::{write::FileOptions, ZipWriter};
+use zip::{write::SimpleFileOptions, ZipWriter};
 
 pub const ARCHIVE_DEFAULT_FILE_EXTENSION: &str = "zip";
 pub const ARCHIVE_MIME_TYPE: &str = "application/x-zip";
@@ -208,7 +208,7 @@ fn create_archive(src_dirs: &[PathBuf], archive_file_path: &Path) -> Result<()> 
         .with_context(|| format!("Cannot create archive '{}'", archive_file_path.to_string_lossy()))?;
 
     let mut zip = ZipWriter::new(archive_file);
-    let options = FileOptions::default().compression_method(zip::CompressionMethod::Bzip2);
+    let options = SimpleFileOptions::default().compression_method(zip::CompressionMethod::Bzip2);
 
     for src_dir in src_dirs {
         let parent_dir = src_dir
