@@ -2,6 +2,16 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [v0.1.14](https://github.com/x-software-com/mxl-investigator/compare/d5f360e6f294808ad37752cd1610573c58ddfcac..v0.1.14) - 2024-07-18
+#### Build system
+- **(deps)** update VCPKG version to 2024.05.24 - ([9a79418](https://github.com/x-software-com/mxl-investigator/commit/9a79418b6525c2932d84422e4ed6fea03478ec37)) - marcbull
+- **(deps)** update relm4-icons to 0.9 and mxl-relm4-components to v0.2.0 - ([1efbfbc](https://github.com/x-software-com/mxl-investigator/commit/1efbfbc820a45f14baca3117039dbd1e1dd26ecb)) - marcbull
+- **(deps)** update vcpkg-ports-mxl submodule - ([08bb494](https://github.com/x-software-com/mxl-investigator/commit/08bb494326c47c8f0b8f4b537f37617007afec02)) - marcbull
+#### Miscellaneous Chores
+- **(deps)** bump crate-ci/typos from 1.20.4 to 1.23.2 (#19) - ([d5f360e](https://github.com/x-software-com/mxl-investigator/commit/d5f360e6f294808ad37752cd1610573c58ddfcac)) - dependabot[bot]
+
+- - -
+
 ## [v0.1.13](https://github.com/x-software-com/mxl-investigator/compare/78fde496705ed4c61956208d0f67b1579c088093..v0.1.13) - 2024-07-12
 #### Miscellaneous Chores
 - update dependencies - ([78fde49](https://github.com/x-software-com/mxl-investigator/commit/78fde496705ed4c61956208d0f67b1579c088093)) - acpiccolo
