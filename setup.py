@@ -19,7 +19,7 @@ def setup():
 
     setup_tools(options.ci)
     if options.vcpkg:
-        setup_vcpkg('mxl-investigator', '2024.03.25')
+        setup_vcpkg('mxl-investigator', '2024.05.24')
     setup_write_mxl_env()
 
 
