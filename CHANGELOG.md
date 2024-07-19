@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [v0.1.15](https://github.com/x-software-com/mxl-investigator/compare/9e235652f79a4826434602ca2b7caad03ea949ab..v0.1.15) - 2024-07-19
+#### Miscellaneous Chores
+- upgrade mxl-relm4-components dependency - ([d083c58](https://github.com/x-software-com/mxl-investigator/commit/d083c58b55d522233ee7ed58753efbf370929572)) - acpiccolo
+- use glib::clone!() - ([9e23565](https://github.com/x-software-com/mxl-investigator/commit/9e235652f79a4826434602ca2b7caad03ea949ab)) - acpiccolo
+
+- - -
+
 ## [v0.1.14](https://github.com/x-software-com/mxl-investigator/compare/d5f360e6f294808ad37752cd1610573c58ddfcac..v0.1.14) - 2024-07-18
 #### Build system
 - **(deps)** update VCPKG version to 2024.05.24 - ([9a79418](https://github.com/x-software-com/mxl-investigator/commit/9a79418b6525c2932d84422e4ed6fea03478ec37)) - marcbull
