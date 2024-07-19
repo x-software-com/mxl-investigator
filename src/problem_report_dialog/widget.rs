@@ -172,13 +172,14 @@ impl Component for ProblemReportDialog {
             },
         };
 
-        root.upcast_ref::<gtk::Window>().connect_close_request({
-            let sender = sender.clone();
+        root.upcast_ref::<gtk::Window>().connect_close_request(glib::clone!(
+            #[strong]
+            sender,
             move |_| {
                 sender.output(ProblemReportDialogOutput::Closed).unwrap_or_default();
                 glib::Propagation::Proceed
             }
-        });
+        ));
 
         let widgets = view_output!();
         mxl_relm4_components::gtk::do_closure_on_escape(&root, move || {
