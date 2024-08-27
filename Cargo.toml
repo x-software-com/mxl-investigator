@@ -27,7 +27,7 @@ humantime = "2"
 sysinfo = { version = "0.31", optional = true }
 
 # Internationalization:
-i18n-embed-fl = { version = "0.8" }
+i18n-embed-fl = { version = "0.9" }
 once_cell = { version = "1" }
 rust-embed = { version = "8", features = ["debug-embed"] }
 i18n-embed = { version = "0.14", features = [
