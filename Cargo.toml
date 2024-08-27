@@ -24,6 +24,7 @@ mxl-relm4-components = { git = "https://github.com/x-software-com/mxl-relm4-comp
 urlencoding = { version = "2", default-features = false, optional = true }
 backtrace = "0.3"
 humantime = "2"
+sysinfo = { version = "0.31", optional = true }
 
 # Internationalization:
 i18n-embed-fl = { version = "0.8" }
@@ -35,6 +36,7 @@ i18n-embed = { version = "0.14", features = [
 ] }
 
 [features]
+default = ["sysinfo"]
 with_test = ["dep:tempfile"]
 create_report_dialog = [
     "dep:mxl-relm4-components",
@@ -46,3 +48,4 @@ problem_report_dialog = [
     "relm4-icons/all",
     "dep:urlencoding",
 ]
+sysinfo = ["dep:sysinfo"]

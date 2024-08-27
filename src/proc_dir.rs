@@ -22,6 +22,8 @@ const LOCK_FILE_NAME: &str = "run.lock";
 const REPORT_FILE_NAME: &str = "exit_report.txt";
 const KEEP_NUMBER_OF_FAILED_RUNS: usize = 20;
 const PANIC_FILE_EXTENSION: &str = "panic";
+#[cfg(feature = "sysinfo")]
+const SYSINFO_FILE_NAME: &str = "sysinfo.txt";
 
 static RUN_DIR_HOLDER: OnceCell<PathBuf> = OnceCell::new();
 
@@ -170,6 +172,74 @@ fn create_lock_file(path: &Path) -> &'static Result<LockFile> {
     })
 }
 
+#[cfg(feature = "sysinfo")]
+fn create_sysinfo(path: &Path) -> Result<()> {
+    use sysinfo::{Components, Disks, Networks, System};
+
+    let sysinfo_file_path = path.join(SYSINFO_FILE_NAME);
+    let mut file = File::create(&sysinfo_file_path)
+        .with_context(|| format!("Cannot create file '{}'", sysinfo_file_path.to_string_lossy()))?;
+
+    let mut sys = sysinfo::System::new_all();
+    sys.refresh_all();
+
+    let mut out = Vec::new();
+    writeln!(&mut out, "=> system:")?;
+    // RAM and swap information:
+    writeln!(&mut out, "total memory: {} bytes", sys.total_memory())?;
+    writeln!(&mut out, "used memory : {} bytes", sys.used_memory())?;
+    writeln!(&mut out, "total swap  : {} bytes", sys.total_swap())?;
+    writeln!(&mut out, "used swap   : {} bytes", sys.used_swap())?;
+
+    // Display system information:
+    writeln!(&mut out, "System name:             {:?}", System::name())?;
+    writeln!(&mut out, "System kernel version:   {:?}", System::kernel_version())?;
+    writeln!(&mut out, "System OS version:       {:?}", System::os_version())?;
+    writeln!(&mut out, "System host name:        {:?}", System::host_name())?;
+
+    // Number of CPUs:
+    writeln!(&mut out, "NB CPUs: {}", sys.cpus().len())?;
+
+    // Display processes ID, name na disk usage:
+    if false {
+        for (pid, process) in sys.processes() {
+            writeln!(&mut out, "[{pid}] {:?} {:?}", process.name(), process.disk_usage())?;
+        }
+    }
+
+    // We display all disks' information:
+    writeln!(&mut out, "=> disks:")?;
+    let disks = Disks::new_with_refreshed_list();
+    for disk in &disks {
+        writeln!(&mut out, "{disk:?}")?;
+    }
+
+    // Network interfaces name, total data received and total data transmitted:
+    let networks = Networks::new_with_refreshed_list();
+    writeln!(&mut out, "=> networks:")?;
+    for (interface_name, data) in &networks {
+        writeln!(
+            &mut out,
+            "{interface_name}: {} B (down) / {} B (up)",
+            data.total_received(),
+            data.total_transmitted(),
+        )?;
+        // If you want the amount of data received/transmitted since last call
+        // to `Networks::refresh`, use `received`/`transmitted`.
+    }
+
+    // Components temperature:
+    let components = Components::new_with_refreshed_list();
+    writeln!(&mut out, "=> components:")?;
+    for component in &components {
+        writeln!(&mut out, "{component:?}")?;
+    }
+
+    file.write_all(out.as_slice())?;
+
+    Ok(())
+}
+
 pub fn proc_dir() -> &'static PathBuf {
     RUN_DIR_HOLDER.get_or_init(|| {
         let data_dir = chrono::Local::now().format(CURRENT_DIR_FMT).to_string();
@@ -179,6 +249,8 @@ pub fn proc_dir() -> &'static PathBuf {
         if let Err(err) = create_lock_file(&data_dir) {
             panic!("Cannot lock directory: {:?}", err);
         }
+        #[cfg(feature = "sysinfo")]
+        create_sysinfo(&data_dir).unwrap_or_else(|error| panic!("Cannot write system information: {:?}", error));
         move_to_failed_dir().unwrap_or_else(|error| panic!("Cannot move failed runs: {:?}", error));
         cleanup_dir(default_failed_dir()).unwrap_or_else(|error| panic!("Cannot cleanup failed runs: {:?}", error));
         data_dir
