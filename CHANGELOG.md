@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [v0.1.16](https://github.com/x-software-com/mxl-investigator/compare/bb48a1880c7e826e8a60eb36d63d255ded52c554..v0.1.16) - 2024-08-27
+#### Features
+- write file with system information - ([bb48a18](https://github.com/x-software-com/mxl-investigator/commit/bb48a1880c7e826e8a60eb36d63d255ded52c554)) - acpiccolo
+
+- - -
+
 ## [v0.1.15](https://github.com/x-software-com/mxl-investigator/compare/9e235652f79a4826434602ca2b7caad03ea949ab..v0.1.15) - 2024-07-19
 #### Miscellaneous Chores
 - upgrade mxl-relm4-components dependency - ([d083c58](https://github.com/x-software-com/mxl-investigator/commit/d083c58b55d522233ee7ed58753efbf370929572)) - acpiccolo
