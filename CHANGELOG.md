@@ -2,6 +2,20 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [v0.1.17](https://github.com/x-software-com/mxl-investigator/compare/384a9d4386f9cead68905f973925a0fabfb5509b..v0.1.17) - 2024-09-02
+#### Features
+- add method to execute commands and write stdout and stderr to files in the proc directory - ([0c2c862](https://github.com/x-software-com/mxl-investigator/commit/0c2c862e60a91ce1d6ab67c7e3ab056d90708faf)) - acpiccolo
+- add callback before directory archiving - ([599b047](https://github.com/x-software-com/mxl-investigator/commit/599b0475970502bcda5041eee7eb7fb5afc9ebf9)) - acpiccolo
+- user interface use a thread for report archive creation - ([85c9bf9](https://github.com/x-software-com/mxl-investigator/commit/85c9bf97fce0c374dbd600d0867c08742a0e2294)) - acpiccolo
+- add check to prevent error if there are files in proc directory - ([384a9d4](https://github.com/x-software-com/mxl-investigator/commit/384a9d4386f9cead68905f973925a0fabfb5509b)) - acpiccolo
+#### Miscellaneous Chores
+- increase versions of dependencies - ([8587e19](https://github.com/x-software-com/mxl-investigator/commit/8587e19528d6172abd90e0d65d300f01e3048880)) - acpiccolo
+#### Refactoring
+- move system information feature - ([875a565](https://github.com/x-software-com/mxl-investigator/commit/875a565e15b14f7b2057805de205ed4ca184c5ad)) - acpiccolo
+- move code - ([54b3823](https://github.com/x-software-com/mxl-investigator/commit/54b382336f873781aa7641f90f90a13484b93365)) - acpiccolo
+
+- - -
+
 ## [v0.1.16](https://github.com/x-software-com/mxl-investigator/compare/bb48a1880c7e826e8a60eb36d63d255ded52c554..v0.1.16) - 2024-08-27
 #### Features
 - write file with system information - ([bb48a18](https://github.com/x-software-com/mxl-investigator/commit/bb48a1880c7e826e8a60eb36d63d255ded52c554)) - acpiccolo
