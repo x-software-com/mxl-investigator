@@ -112,6 +112,9 @@ fn move_to_failed_dir() -> Result<()> {
             };
 
             let existing_run_dir = entry.path();
+            if !existing_run_dir.is_dir() {
+                continue;
+            }
             let lock_file_path = existing_run_dir.join(LOCK_FILE_NAME);
 
             match File::open(&lock_file_path)
