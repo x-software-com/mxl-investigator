@@ -1,6 +1,6 @@
 use crate::localization::helper::fl;
 use anyhow::{Context, Result};
-use fs4::FileExt;
+use fs4::fs_std::FileExt;
 use once_cell::sync::{Lazy, OnceCell};
 use std::{
     fs::File,
