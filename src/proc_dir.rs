@@ -26,6 +26,8 @@ const PANIC_FILE_EXTENSION: &str = "panic";
 const SYSINFO_FILE_NAME: &str = "sysinfo.txt";
 
 static RUN_DIR_HOLDER: OnceCell<PathBuf> = OnceCell::new();
+pub type ProcDirArchiveCallback = fn();
+static PROC_DIR_ARCHIVE_CREATE_CALLBACK: OnceCell<ProcDirArchiveCallback> = OnceCell::new();
 
 fn create_dir_all_with_panic<P: AsRef<Path> + std::fmt::Debug>(path: P) {
     std::fs::create_dir_all(&path).unwrap_or_else(|error| panic!("Cannot create directory {:?}: {:?}", path, error));
@@ -474,7 +476,14 @@ pub(crate) fn create_report_file_name(binary_name: &str) -> String {
     format!("{}_report.{}", binary_name, ARCHIVE_DEFAULT_FILE_EXTENSION)
 }
 
+pub fn proc_dir_archive_set_callback(callback: ProcDirArchiveCallback) {
+    PROC_DIR_ARCHIVE_CREATE_CALLBACK.set(callback).unwrap();
+}
+
 pub fn proc_dir_archive(archive_file_path: &Path) -> Result<()> {
+    if let Some(callback) = PROC_DIR_ARCHIVE_CREATE_CALLBACK.get() {
+        callback();
+    }
     let mut directories = std::fs::read_dir(default_proc_dir())?
         .map(|entry| Ok(entry?.path()))
         .collect::<std::io::Result<Vec<_>>>()?;
