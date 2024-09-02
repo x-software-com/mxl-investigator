@@ -126,3 +126,37 @@ pub fn create_sysinfo_dump() {
         }
     }
 }
+
+pub fn exec_cmd_and_dump_pipes(command: std::process::Command) {
+    fn exec_cmd(command: std::process::Command) -> Result<()> {
+        let path = crate::proc_dir::proc_dir();
+        let mut stdout_file_name = std::ffi::OsString::new();
+        stdout_file_name.push(command.get_program());
+        stdout_file_name.push("_stdout.txt");
+        let mut stdout_file = File::options()
+            .create(true)
+            .append(true)
+            .open(path.join(stdout_file_name))?;
+        writeln!(&mut stdout_file, "{command:?}")?;
+        let mut stderr_file_name = std::ffi::OsString::new();
+        stderr_file_name.push(command.get_program());
+        stderr_file_name.push("_stderr.txt");
+        let mut stderr_file = File::options()
+            .create(true)
+            .append(true)
+            .open(path.join(stderr_file_name))?;
+        writeln!(&mut stderr_file, "{command:?}")?;
+        let mut command = command;
+        command.stdout(stdout_file).stderr(stderr_file);
+        command
+            .spawn()
+            .with_context(|| format!("Cannot start {:?}", command.get_program()))?
+            .wait()
+            .with_context(|| format!("Cannot wait for {:?}", command.get_program()))?;
+        Ok(())
+    }
+
+    if let Err(err) = exec_cmd(command) {
+        log::warn!("Cannot execute command: {:?}", err);
+    }
+}
