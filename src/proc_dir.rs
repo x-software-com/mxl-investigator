@@ -92,24 +92,25 @@ fn move_to_failed_dir() -> Result<()> {
     // Move failed runs out of the run directory:
     let failed_dir = default_failed_dir();
     let proc_dir = default_proc_dir();
+
+    let preserve_dir = |from: &Path| {
+        let from_dir_name = from
+            .file_name()
+            .unwrap_or_else(|| panic!("Cannot get name of path '{:?}'", from));
+        let to = failed_dir.join(from_dir_name);
+        std::fs::rename(from, &to).with_context(|| {
+            format!(
+                "Cannot move failed run data directory from '{}' to '{}'",
+                from.to_string_lossy(),
+                to.to_string_lossy()
+            )
+        })
+    };
+
     if let Ok(entry) = std::fs::read_dir(proc_dir) {
         for entry in entry {
             let entry =
                 entry.with_context(|| format!("Cannot list directories in '{}'", proc_dir.to_string_lossy()))?;
-
-            let preserve_dir = |from: &Path| {
-                let from_dir_name = from
-                    .file_name()
-                    .unwrap_or_else(|| panic!("Cannot get name of path '{:?}'", from));
-                let to = failed_dir.join(from_dir_name);
-                std::fs::rename(from, &to).with_context(|| {
-                    format!(
-                        "Cannot move failed run data directory from '{}' to '{}'",
-                        from.to_string_lossy(),
-                        to.to_string_lossy()
-                    )
-                })
-            };
 
             let existing_run_dir = entry.path();
             if !existing_run_dir.is_dir() {
