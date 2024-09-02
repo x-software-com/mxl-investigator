@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [v0.1.18](https://github.com/x-software-com/mxl-investigator/compare/992895ce29d3778d3a01f0b6041e889780e2471a..v0.1.18) - 2024-09-02
+#### Miscellaneous Chores
+- update mxl-relm4-components dependency to v0.2.2 - ([992895c](https://github.com/x-software-com/mxl-investigator/commit/992895ce29d3778d3a01f0b6041e889780e2471a)) - acpiccolo
+
+- - -
+
 ## [v0.1.17](https://github.com/x-software-com/mxl-investigator/compare/384a9d4386f9cead68905f973925a0fabfb5509b..v0.1.17) - 2024-09-02
 #### Features
 - add method to execute commands and write stdout and stderr to files in the proc directory - ([0c2c862](https://github.com/x-software-com/mxl-investigator/commit/0c2c862e60a91ce1d6ab67c7e3ab056d90708faf)) - acpiccolo
