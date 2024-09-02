@@ -47,7 +47,7 @@ impl Component for CreateReportDialog {
     type Init = CreateReportDialogInit;
     type Input = CreateReportDialogInput;
     type Output = CreateReportDialogOutput;
-    type CommandOutput = ();
+    type CommandOutput = anyhow::Result<()>;
 
     view! {
         adw::Window {
@@ -91,6 +91,23 @@ impl Component for CreateReportDialog {
                                         connect_activated => CreateReportDialogInput::PrivateMessage(PrivateMsg::OpenFileChooser),
                                     },
                                 },
+                            },
+                        },
+
+                        #[name(progress_page)]
+                        gtk::Box {
+                            set_orientation: gtk::Orientation::Horizontal,
+                            set_spacing: 8,
+                            set_halign: gtk::Align::Center,
+
+                            gtk::Spinner {
+                                #[watch]
+                                set_spinning: true,
+                                set_size_request: (32, 32),
+                            },
+                            gtk::Label {
+                                add_css_class: "title-2",
+                                set_label: &&fl!("create-report-dialog", "progress-description"),
                             },
                         },
 
@@ -193,18 +210,9 @@ impl Component for CreateReportDialog {
                 }
                 PrivateMsg::CreateReport(path) => {
                     self.file_name = path.to_string_lossy().to_string();
-                    if let Err(err) = crate::proc_dir::proc_dir_archive(&path) {
-                        widgets
-                            .error_page
-                            .set_description(Some(glib::markup_escape_text(&format!("{:?}", err)).as_str()));
-                        sender.input(CreateReportDialogInput::PrivateMessage(PrivateMsg::SwitchForwardTo(
-                            widgets.error_page.clone().into(),
-                        )));
-                    } else {
-                        sender.input(CreateReportDialogInput::PrivateMessage(PrivateMsg::SwitchForwardTo(
-                            widgets.success_page.clone().into(),
-                        )));
-                    }
+                    widgets.stack_view.set_transition_type(gtk::StackTransitionType::None);
+                    widgets.stack_view.set_visible_child(&widgets.progress_page);
+                    sender.spawn_oneshot_command(move || crate::proc_dir::proc_dir_archive(&path));
                     self.update_view(widgets, sender);
                 }
             },
@@ -217,6 +225,27 @@ impl Component for CreateReportDialog {
                 self.file_chooser.widget().set_transient_for(top_level.as_ref());
                 root.present();
             }
+        }
+    }
+
+    fn update_cmd_with_view(
+        &mut self,
+        widgets: &mut Self::Widgets,
+        message: Self::CommandOutput,
+        sender: ComponentSender<Self>,
+        _root: &Self::Root,
+    ) {
+        if let Err(err) = message {
+            widgets
+                .error_page
+                .set_description(Some(glib::markup_escape_text(&format!("{:?}", err)).as_str()));
+            sender.input(CreateReportDialogInput::PrivateMessage(PrivateMsg::SwitchForwardTo(
+                widgets.error_page.clone().into(),
+            )));
+        } else {
+            sender.input(CreateReportDialogInput::PrivateMessage(PrivateMsg::SwitchForwardTo(
+                widgets.success_page.clone().into(),
+            )));
         }
     }
 }

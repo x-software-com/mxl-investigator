@@ -18,6 +18,8 @@ problem-report-dialog = Problem report
 
 create-report-dialog = Create report file
     .file-description = If you need assistance, you can generate a report file of the current session. The report will not contain any video or audio data.
+    .progress-title = Report creating
+    .progress-description = Creating...
     .success-title = Report creation succeeded
     .success-description = The report file saved to '{$file_name}'. If your request relates to encoded video or audio data, please send it together with your created report file to {$support_mail}
     .error-title = Report creation failed
