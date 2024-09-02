@@ -1,5 +1,6 @@
+use anyhow::{Context, Result};
 use once_cell::sync::OnceCell;
-use std::path::PathBuf;
+use std::{fs::File, io::Write, path::PathBuf};
 
 #[allow(dead_code)]
 pub(crate) const SUPPORT_EMAIL: &str = "support@x-software.com";
@@ -30,4 +31,98 @@ pub fn init_test() {
     static TMP_DIR: Lazy<TempDir> = Lazy::new(|| TempDir::new().expect("Failed create tmp directory"));
 
     init(TMP_DIR.path().to_path_buf());
+}
+
+pub fn log_sysinfo(level: log::Level) {
+    #[cfg(feature = "sysinfo")]
+    {
+        use sysinfo::System;
+
+        log::log!(
+            level,
+            "System='{}' Kernel='{}' OS='{}' Hostname={}",
+            System::name().unwrap_or("unknown".into()),
+            System::kernel_version().unwrap_or("unknown".into()),
+            System::long_os_version().unwrap_or("unknown".into()),
+            System::host_name().unwrap_or("unknown".into())
+        );
+    }
+}
+
+pub fn create_sysinfo_dump() {
+    #[cfg(feature = "sysinfo")]
+    {
+        fn create_sysinfo() -> Result<()> {
+            use sysinfo::{Components, Disks, Networks, System};
+
+            let sysinfo_file_path = crate::proc_dir::proc_dir().join("sysinfo.txt");
+            let mut file = File::options()
+                .create(true)
+                .append(true)
+                .open(&sysinfo_file_path)
+                .with_context(|| format!("Cannot create file '{}'", sysinfo_file_path.to_string_lossy()))?;
+
+            let sys = sysinfo::System::new_with_specifics(sysinfo::RefreshKind::new().without_processes());
+
+            let mut out = Vec::new();
+            writeln!(&mut out, "=> system:")?;
+            // RAM and swap information:
+            writeln!(&mut out, "total memory: {} bytes", sys.total_memory())?;
+            writeln!(&mut out, "used memory : {} bytes", sys.used_memory())?;
+            writeln!(&mut out, "total swap  : {} bytes", sys.total_swap())?;
+            writeln!(&mut out, "used swap   : {} bytes", sys.used_swap())?;
+
+            // Display system information:
+            writeln!(&mut out, "System name:             {:?}", System::name())?;
+            writeln!(&mut out, "System kernel version:   {:?}", System::kernel_version())?;
+            writeln!(&mut out, "System OS version:       {:?}", System::os_version())?;
+            writeln!(&mut out, "System long OS version:  {:?}", System::long_os_version())?;
+            writeln!(&mut out, "System host name:        {:?}", System::host_name())?;
+
+            // Number of CPUs:
+            writeln!(&mut out, "NB CPUs: {}", sys.cpus().len())?;
+
+            // Display processes ID, name na disk usage:
+            if false {
+                for (pid, process) in sys.processes() {
+                    writeln!(&mut out, "[{pid}] {:?} {:?}", process.name(), process.disk_usage())?;
+                }
+            }
+
+            // We display all disks' information:
+            writeln!(&mut out, "=> disks:")?;
+            let disks = Disks::new_with_refreshed_list();
+            for disk in &disks {
+                writeln!(&mut out, "{disk:?}")?;
+            }
+
+            // Network interfaces name, total data received and total data transmitted:
+            let networks = Networks::new_with_refreshed_list();
+            writeln!(&mut out, "=> networks:")?;
+            for (interface_name, data) in &networks {
+                writeln!(
+                    &mut out,
+                    "{interface_name}: {} B (down) / {} B (up)",
+                    data.total_received(),
+                    data.total_transmitted(),
+                )?;
+                // If you want the amount of data received/transmitted since last call
+                // to `Networks::refresh`, use `received`/`transmitted`.
+            }
+
+            // Components temperature:
+            let components = Components::new_with_refreshed_list();
+            writeln!(&mut out, "=> components:")?;
+            for component in &components {
+                writeln!(&mut out, "{component:?}")?;
+            }
+
+            file.write_all(out.as_slice())?;
+            Ok(())
+        }
+
+        if let Err(err) = create_sysinfo() {
+            log::warn!("Cannot create system information: {:?}", err);
+        }
+    }
 }
