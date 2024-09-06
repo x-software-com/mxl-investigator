@@ -62,7 +62,8 @@ pub fn create_sysinfo_dump() {
                 .open(&sysinfo_file_path)
                 .with_context(|| format!("Cannot create file '{}'", sysinfo_file_path.to_string_lossy()))?;
 
-            let sys = sysinfo::System::new_with_specifics(sysinfo::RefreshKind::new().without_processes());
+            let mut sys = sysinfo::System::new_all();
+            sys.refresh_all();
 
             let mut out = Vec::new();
             writeln!(&mut out, "=> system:")?;
