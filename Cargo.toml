@@ -24,7 +24,7 @@ mxl-relm4-components = { git = "https://github.com/x-software-com/mxl-relm4-comp
 urlencoding = { version = "2", default-features = false, optional = true }
 backtrace = "0.3"
 humantime = "2"
-sysinfo = { version = "0.31", optional = true }
+sysinfo = { version = "0.32", optional = true }
 
 # Internationalization:
 i18n-embed-fl = { version = "0.9" }
